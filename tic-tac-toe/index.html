@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - Unbeatable AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⭕ Tic Tac Toe</h1>
+            <p class="subtitle">Challenge the Unbeatable AI!</p>
+        </header>
+
+        <div class="game-info">
+            <div class="info-card">
+                <h3>Player</h3>
+                <div class="player-symbol">X</div>
+            </div>
+            <div class="info-card">
+                <h3>Score</h3>
+                <div class="score">
+                    <span id="playerScore">0</span> - <span id="aiScore">0</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <h3>AI</h3>
+                <div class="ai-symbol">O</div>
+            </div>
+        </div>
+
+        <div class="status" id="status">Your turn! Click any square to start.</div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="resetBtn">🔄 New Game</button>
+            <button class="btn btn-secondary" id="resetScoreBtn">📊 Reset Score</button>
+        </div>
+
+        <div class="info-section">
+            <h3>🧠 About the AI</h3>
+            <p>This AI uses the <strong>Minimax Algorithm</strong> to make optimal moves. It evaluates all possible game states and chooses the best move. The AI is unbeatable - the best you can do is draw!</p>
+            
+            <div class="algorithm-info">
+                <h4>How Minimax Works:</h4>
+                <ul>
+                    <li>Evaluates all possible moves recursively</li>
+                    <li>Assumes both players play optimally</li>
+                    <li>Assigns scores: +1 (AI wins), -1 (Player wins), 0 (Draw)</li>
+                    <li>Chooses moves that maximize AI's score</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with ❤️ for CodSoft Internship | Try to beat the AI!</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
