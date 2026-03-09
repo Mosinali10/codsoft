@@ -78,12 +78,12 @@ function checkResult() {
 
     if (roundWon) {
         if (currentPlayer === 'X') {
-            status.textContent = '🎉 You Win! (Lucky!)';
+            status.textContent = 'You win.';
             status.className = 'status win';
             playerScore++;
             playerScoreEl.textContent = playerScore;
         } else {
-            status.textContent = '😔 AI Wins!';
+            status.textContent = 'AI wins.';
             status.className = 'status lose';
             aiScore++;
             aiScoreEl.textContent = aiScore;
@@ -101,7 +101,7 @@ function checkResult() {
 
     // Check for draw
     if (!board.includes('')) {
-        status.textContent = '🤝 It\'s a Draw!';
+        status.textContent = 'Draw.';
         status.className = 'status draw';
         gameActive = false;
         return;
@@ -111,9 +111,9 @@ function checkResult() {
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     
     if (currentPlayer === 'O') {
-        status.textContent = '🤖 AI is thinking...';
+        status.textContent = 'AI is thinking...';
     } else {
-        status.textContent = '🎮 Your turn!';
+        status.textContent = 'Your turn.';
     }
 }
 
@@ -195,7 +195,7 @@ function resetGame() {
     board = ['', '', '', '', '', '', '', '', ''];
     currentPlayer = 'X';
     gameActive = true;
-    status.textContent = 'Your turn! Click any square to start.';
+    status.textContent = 'Your turn. Click any square to start.';
     status.className = 'status';
     
     cells.forEach(cell => {

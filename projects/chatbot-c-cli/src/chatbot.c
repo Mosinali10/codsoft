@@ -5,64 +5,110 @@
 #include <ctype.h>
 #include <math.h>
 
-void get_response(char *input, char *response);
-void start_quiz();
-void after_quiz();
-void tell_joke(char *response);
-void clean_input(char *input);
-int compare_keywords(const char *input, const char *keyword);
-double calculate(char *input);
-void continue_joke(char *response);
+static void get_response(char *input, char *response);
+static void start_quiz(void);
+static void after_quiz(void);
+static void tell_joke(char *response);
+static void clean_input(char *input);
+static int compare_keywords(const char *input, const char *keyword);
+static double calculate(const char *input);
+static void continue_joke(char *response);
 
-int joke_step = 0;
-const char *current_joke_question = NULL;
-const char *current_joke_answer = NULL;
+static int joke_step = 0;
+static const char *current_joke_question = NULL;
+static const char *current_joke_answer = NULL;
 
-void clean_input(char *input) {
+static void clean_input(char *input) {
     for (int i = 0; input[i]; i++) {
-        input[i] = tolower(input[i]);
+        input[i] = (char)tolower((unsigned char)input[i]);
     }
     input[strcspn(input, "\n")] = 0;
 }
 
-int compare_keywords(const char *input, const char *keyword) {
+static int compare_keywords(const char *input, const char *keyword) {
     return strstr(input, keyword) != NULL;
 }
 
-void get_response(char *input, char *response) {
+static void get_response(char *input, char *response) {
     clean_input(input);
+
     if (compare_keywords(input, "hi") || compare_keywords(input, "hello") || compare_keywords(input, "hey")) {
-        strcpy(response, "Hello! How can I assist you today?,type exit to end conversation");
-    } else if (compare_keywords(input, "how are you")) {
+        strcpy(response, "Hello! How can I assist you today? (type 'exit' to end)");
+        return;
+    }
+
+    if (compare_keywords(input, "how are you")) {
         strcpy(response, "I'm doing great, thank you! How can I assist you today?");
-    } else if (compare_keywords(input, "what's your name") || compare_keywords(input, "what is your name")) {
-        strcpy(response, "I'm bot, chatbot.");
-    } else if (compare_keywords(input, "how old are you")) {
-        strcpy(response, "I was never born, I'm created.");
-    } else if (compare_keywords(input, "suggest something") || compare_keywords(input, "i'm getting bored") || compare_keywords(input, "let's play")) {
-        strcpy(response, "I can help with the following:\n- Start a quiz (type 'quiz')\n- Tell a joke (type 'jokes')\n- Perform basic math calculations (type 'calculate' or 'math')\n- Answer general questions\nHow can I assist you today?");
-    } else if (compare_keywords(input, "quiz") || compare_keywords(input, "ok") || compare_keywords(input, "let's play quiz")) {
+        return;
+    }
+
+    if (compare_keywords(input, "what's your name") || compare_keywords(input, "what is your name")) {
+        strcpy(response, "I'm a simple C chatbot.");
+        return;
+    }
+
+    if (compare_keywords(input, "how old are you")) {
+        strcpy(response, "I'm software, so I don't have an age.");
+        return;
+    }
+
+    if (compare_keywords(input, "suggest something") || compare_keywords(input, "i'm getting bored") || compare_keywords(input, "let's play")) {
+        strcpy(
+            response,
+            "Available commands:\n"
+            "- quiz\n"
+            "- jokes\n"
+            "- calculate\n"
+            "- what's the time\n"
+            "- exit"
+        );
+        return;
+    }
+
+    if (compare_keywords(input, "quiz") || compare_keywords(input, "let's play quiz")) {
         strcpy(response, "Starting the quiz...");
-    } else if (compare_keywords(input, "what's the weather like") || compare_keywords(input, "what is the weather like")) {
-        strcpy(response, "I'm not connected to the internet, but you can check a weather app for the latest updates.");
-    } else if (compare_keywords(input, "what's the time") || compare_keywords(input, "what is the time")) {
+        return;
+    }
+
+    if (compare_keywords(input, "what's the weather like") || compare_keywords(input, "what is the weather like")) {
+        strcpy(response, "I'm not connected to the internet. Please check a weather app.");
+        return;
+    }
+
+    if (compare_keywords(input, "what's the time") || compare_keywords(input, "what is the time")) {
         time_t t;
         time(&t);
         snprintf(response, 500, "The current time is: %s", ctime(&t));
-    } else if (compare_keywords(input, "tell me a joke") || compare_keywords(input, "jokes")) {
-        tell_joke(response);
-    } else if ((compare_keywords(input, "why") || compare_keywords(input, "what")) && joke_step == 1) {
-        continue_joke(response);
-    } else if (compare_keywords(input, "calculate") || compare_keywords(input, "calculator") || compare_keywords(input, "math")) {
-        strcpy(response, "Sure! Please enter an arithmetic expression to calculate.");
-    } else if (compare_keywords(input, "exit")) {
-        strcpy(response, "Goodbye! Have a great day!");
-    } else {
-        strcpy(response, "Sorry, I don't understand that. Here's what I can do:\n- Start a quiz (type 'quiz')\n- Tell a joke (type 'jokes')\n- Perform basic math calculations (type 'calculate' or 'math')\n- Answer general questions\nHow can I assist you today?");
+        return;
     }
+
+    if (compare_keywords(input, "tell me a joke") || compare_keywords(input, "jokes")) {
+        tell_joke(response);
+        return;
+    }
+
+    if ((compare_keywords(input, "why") || compare_keywords(input, "what")) && joke_step == 1) {
+        continue_joke(response);
+        return;
+    }
+
+    if (compare_keywords(input, "calculate") || compare_keywords(input, "calculator") || compare_keywords(input, "math")) {
+        strcpy(response, "Enter an arithmetic expression (example: 15 + 25):");
+        return;
+    }
+
+    if (compare_keywords(input, "exit")) {
+        strcpy(response, "Goodbye! Have a great day!");
+        return;
+    }
+
+    strcpy(
+        response,
+        "Sorry, I didn't understand. Try: quiz, jokes, calculate, what's the time, exit."
+    );
 }
 
-void tell_joke(char *response) {
+static void tell_joke(char *response) {
     const char *jokes[][2] = {
         {"Why don't scientists trust atoms?", "Because they make up everything!"},
         {"Why did the scarecrow win an award?", "Because he was outstanding in his field!"},
@@ -84,15 +130,17 @@ void tell_joke(char *response) {
     strcpy(response, current_joke_question);
 }
 
-void continue_joke(char *response) {
+static void continue_joke(char *response) {
     strcpy(response, current_joke_answer);
     joke_step = 0;
 }
 
-double calculate(char *input) {
+static double calculate(const char *input) {
     char operator;
     double num1, num2;
-    sscanf(input, "%lf %c %lf", &num1, &operator, &num2);
+    if (sscanf(input, "%lf %c %lf", &num1, &operator, &num2) != 3) {
+        return NAN;
+    }
     if (num1 > 1e7 || num2 > 1e7) {
         return NAN;
     }
@@ -104,16 +152,13 @@ double calculate(char *input) {
         case '*':
             return num1 * num2;
         case '/':
-            if (num2 != 0)
-                return num1 / num2;
-            else
-                return NAN;
+            return (num2 != 0) ? (num1 / num2) : NAN;
         default:
             return NAN;
     }
 }
 
-void start_quiz() {
+static void start_quiz(void) {
     int score = 0;
     int answer, tries = 1;
     printf("\nLet's start the quiz!\n");
@@ -171,7 +216,7 @@ void start_quiz() {
     after_quiz();
 }
 
-void after_quiz() {
+static void after_quiz(void) {
     char input[200];
     printf("Would you like to do something else? (yes/no): ");
     fgets(input, sizeof(input), stdin);
@@ -184,13 +229,15 @@ void after_quiz() {
     }
 }
 
-int main() {
+int main(void) {
     char input[200];
     char response[500];
     printf("Hello! How can I assist you today?\n");
     while (1) {
         printf("You: ");
-        fgets(input, sizeof(input), stdin);
+        if (!fgets(input, sizeof(input), stdin)) {
+            break;
+        }
         get_response(input, response);
         if (compare_keywords(input, "quiz")) {
             start_quiz();
@@ -202,6 +249,19 @@ int main() {
         } else if ((compare_keywords(input, "why") || compare_keywords(input, "what")) && joke_step == 1) {
             continue_joke(response);
             printf("%s\n", response);
+            continue;
+        } else if (compare_keywords(input, "calculate") || compare_keywords(input, "calculator") || compare_keywords(input, "math")) {
+            printf("%s\n", response);
+            printf("Expression: ");
+            if (!fgets(input, sizeof(input), stdin)) {
+                break;
+            }
+            double result = calculate(input);
+            if (isnan(result)) {
+                printf("Result: error (invalid expression)\n");
+            } else {
+                printf("Result: %.2f\n", result);
+            }
             continue;
         } else if (compare_keywords(input, "exit")) {
             printf("%s\n", response);

@@ -8,7 +8,9 @@ This repository contains four distinct projects demonstrating various programmin
 
 ## 🗂️ Projects
 
-### 1. 🎬 [Movie Recommendation System](./movie-recommendation-system/)
+This repository contains multiple **independent** projects. Each project lives under `projects/` and is runnable on its own.
+
+### 1. 🎬 [Movie Recommender (ML / CLI)](./projects/movie-recommender-ml/)
 
 A content-based movie recommendation engine using machine learning.
 
@@ -19,11 +21,19 @@ A content-based movie recommendation engine using machine learning.
 - 4,803 movie dataset
 - Content-based filtering
 
-[View Project →](./movie-recommendation-system/)
+[View Project →](./projects/movie-recommender-ml/)
 
 ---
 
-### 2. 🌡️ [Temperature Converter](./celsius-to-fahrenheit-converter/)
+### 2. 🎬 [Movie Recommender (Streamlit Web App)](./projects/movie-recommender-streamlit/)
+
+A Streamlit web app demo of a content-based movie recommender.
+
+[View Project →](./projects/movie-recommender-streamlit/)
+
+---
+
+### 3. 🌡️ [Temperature Converter (CLI)](./projects/temperature-converter-cli/)
 
 An interactive command-line tool for temperature conversion.
 
@@ -34,11 +44,19 @@ An interactive command-line tool for temperature conversion.
 - User-friendly interface
 - Bonus: Task Manager application
 
-[View Project →](./celsius-to-fahrenheit-converter/)
+[View Project →](./projects/temperature-converter-cli/)
 
 ---
 
-### 3. ⭕ [Tic Tac Toe with AI](./tic-tac-toe-game/)
+### 4. 🌡️ [Temperature Converter (Streamlit Web App)](./projects/temperature-converter-streamlit/)
+
+A modern Streamlit web app for Celsius ↔ Fahrenheit conversion.
+
+[View Project →](./projects/temperature-converter-streamlit/)
+
+---
+
+### 5. ⭕ [Tic Tac Toe with AI (C / CLI)](./projects/tic-tac-toe-c-minimax/)
 
 An unbeatable Tic Tac Toe game with AI opponent.
 
@@ -49,11 +67,19 @@ An unbeatable Tic Tac Toe game with AI opponent.
 - Win/draw detection
 - Clean ASCII board display
 
-[View Project →](./tic-tac-toe-game/)
+[View Project →](./projects/tic-tac-toe-c-minimax/)
 
 ---
 
-### 4. 🤖 [Interactive Chatbot](./chatbot-c/)
+### 6. ⭕ [Tic Tac Toe with AI (Web)](./projects/tic-tac-toe-web-minimax/)
+
+A modern web-based Tic Tac Toe game featuring an unbeatable AI opponent.
+
+[View Project →](./projects/tic-tac-toe-web-minimax/)
+
+---
+
+### 7. 🤖 [Interactive Chatbot (C / CLI)](./projects/chatbot-c-cli/)
 
 A feature-rich chatbot with games, jokes, and utilities.
 
@@ -65,7 +91,7 @@ A feature-rich chatbot with games, jokes, and utilities.
 - Calculator
 - Time display
 
-[View Project →](./chatbot-c/)
+[View Project →](./projects/chatbot-c-cli/)
 
 ---
 
@@ -99,36 +125,22 @@ All project demonstration videos are available in the [`demo-videos/`](./demo-vi
 ## 📂 Repository Structure
 
 ```
-codsoft-projects/
+codsoft-1/
 │
-├── movie-recommendation-system/
-│   ├── movie_recommendation_system.py
-│   ├── requirements.txt
-│   ├── README.md
-│   └── screenshots/
-│
-├── celsius-to-fahrenheit-converter/
-│   ├── celsius_to_fahrenheit.py
-│   ├── task_manager.py (bonus)
-│   ├── README.md
-│   └── screenshots/
-│
-├── tic-tac-toe-game/
-│   ├── tic_tac_toe.c
-│   ├── README.md
-│   └── screenshots/
-│
-├── chatbot-c/
-│   ├── chatbot.c
-│   ├── README.md
-│   └── screenshots/
+├── projects/
+│   ├── movie-recommender-ml/
+│   ├── movie-recommender-streamlit/
+│   ├── temperature-converter-cli/
+│   ├── temperature-converter-streamlit/
+│   ├── tic-tac-toe-c-minimax/
+│   ├── tic-tac-toe-web-minimax/
+│   └── chatbot-c-cli/
 │
 ├── demo-videos/
-│   ├── movie_recommendation_system.mp4
-│   ├── celsius to fahrenheit .mp4
-│   ├── chatbot.mp4
-│   └── tic tac toe mp4.mp4
+│   └── ...
 │
+├── docs/
+│   └── ...
 └── README.md (this file)
 ```
 
@@ -138,20 +150,23 @@ codsoft-projects/
 
 1. **Install Python dependencies**:
    ```bash
-   cd movie-recommendation-system
+   cd projects/movie-recommender-streamlit
    pip install -r requirements.txt
    ```
 
 2. **Run the project**:
    ```bash
-   python celsius_to_fahrenheit.py
+   streamlit run app.py
    ```
 
 ### C Projects
 
 1. **Compile**:
    ```bash
+   cd projects/chatbot-c-cli/src
    gcc chatbot.c -o chatbot -lm
+
+   cd ../../tic-tac-toe-c-minimax/src
    gcc tic_tac_toe.c -o tic_tac_toe
    ```
 

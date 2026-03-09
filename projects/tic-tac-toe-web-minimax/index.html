@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe - Unbeatable AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>⭕ Tic Tac Toe</h1>
-            <p class="subtitle">Challenge the Unbeatable AI!</p>
+            <h1>Tic Tac Toe</h1>
+            <p class="subtitle">Play against an optimal minimax AI.</p>
         </header>
 
         <div class="game-info">
@@ -30,7 +33,7 @@
             </div>
         </div>
 
-        <div class="status" id="status">Your turn! Click any square to start.</div>
+        <div class="status" id="status">Your turn. Click any square to start.</div>
 
         <div class="game-board" id="gameBoard">
             <div class="cell" data-index="0"></div>
@@ -45,12 +48,12 @@
         </div>
 
         <div class="controls">
-            <button class="btn btn-primary" id="resetBtn">🔄 New Game</button>
-            <button class="btn btn-secondary" id="resetScoreBtn">📊 Reset Score</button>
+            <button class="btn btn-primary" id="resetBtn">New game</button>
+            <button class="btn btn-secondary" id="resetScoreBtn">Reset score</button>
         </div>
 
         <div class="info-section">
-            <h3>🧠 About the AI</h3>
+            <h3>About the AI</h3>
             <p>This AI uses the <strong>Minimax Algorithm</strong> to make optimal moves. It evaluates all possible game states and chooses the best move. The AI is unbeatable - the best you can do is draw!</p>
             
             <div class="algorithm-info">
@@ -65,7 +68,7 @@
         </div>
 
         <footer>
-            <p>Built with ❤️ for CodSoft Internship | Try to beat the AI!</p>
+            <p>Minimax-based Tic Tac Toe (portfolio project)</p>
         </footer>
     </div>
 

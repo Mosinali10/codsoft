@@ -28,10 +28,13 @@ This folder contains demonstration videos for all projects in the repository.
 
 ## 🔗 Quick Links
 
-- [Movie Recommendation System](../movie-recommendation-system/)
-- [Temperature Converter](../celsius-to-fahrenheit-converter/)
-- [Tic Tac Toe Game](../tic-tac-toe-game/)
-- [Chatbot](../chatbot-c/)
+- [Movie Recommender (ML / CLI)](../projects/movie-recommender-ml/)
+- [Movie Recommender (Streamlit)](../projects/movie-recommender-streamlit/)
+- [Temperature Converter (CLI)](../projects/temperature-converter-cli/)
+- [Temperature Converter (Streamlit)](../projects/temperature-converter-streamlit/)
+- [Tic Tac Toe (C / CLI)](../projects/tic-tac-toe-c-minimax/)
+- [Tic Tac Toe (Web)](../projects/tic-tac-toe-web-minimax/)
+- [Chatbot (C / CLI)](../projects/chatbot-c-cli/)
 
 ---
 
