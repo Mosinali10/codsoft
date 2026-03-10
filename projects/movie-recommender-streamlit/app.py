@@ -9,16 +9,16 @@ import difflib
 st.set_page_config(
     page_title="Movie Recommender",
     page_icon="🎞️",
-    layout="wide"
+    layout="centered"
 )
 
 # Theme tokens
-ACCENT = "#F97316"
+ACCENT = "#22C55E"
 BG = "#FFFFFF"
 SURFACE = "#F8FAFC"
 TEXT = "#0F172A"
 BORDER = "#E2E8F0"
-MUTED = "#475569"
+MUTED = "#64748B"
 
 # Custom CSS (minimal SaaS style)
 st.markdown(
@@ -35,11 +35,11 @@ st.markdown(
         background: {BG};
       }}
 
-      /* Constrain content width */
+      /* Constrain content width for focus */
       .block-container {{
-        padding-top: 2.25rem;
-        padding-bottom: 3rem;
-        max-width: 1100px;
+        padding-top: 2rem;
+        padding-bottom: 4rem;
+        max-width: 900px;
       }}
 
       .app-header {{
@@ -97,9 +97,10 @@ st.markdown(
       }}
 
       .badge-accent {{
-        border-color: rgba(249, 115, 22, 0.30);
-        background: rgba(249, 115, 22, 0.10);
-        color: {TEXT};
+        border-color: rgba(34, 197, 94, 0.25);
+        background: rgba(34, 197, 94, 0.08);
+        color: {ACCENT};
+        font-weight: 500;
       }}
 
       /* Buttons */
@@ -110,10 +111,12 @@ st.markdown(
         color: {TEXT};
         padding: 0.6rem 0.85rem;
         font-weight: 600;
+        transition: all 0.2s ease;
       }}
       .stButton > button:hover {{
-        border-color: rgba(249, 115, 22, 0.35);
-        background: rgba(249, 115, 22, 0.06);
+        border-color: {ACCENT};
+        background: rgba(34, 197, 94, 0.04);
+        transform: translateY(-1px);
       }}
 
       /* Text inputs */

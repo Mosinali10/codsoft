@@ -8,197 +8,175 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-ACCENT = "#F97316"
+# Design System Tokens
+ACCENT = "#22C55E"
 BG = "#FFFFFF"
 SURFACE = "#F8FAFC"
 TEXT = "#0F172A"
 BORDER = "#E2E8F0"
-MUTED = "#475569"
+MUTED = "#64748B"
 
+# Logic for temperature messages
+def get_temp_context(celsius):
+    if abs(celsius - 0) < 0.1:
+        return "Freezing point of water"
+    elif abs(celsius - 20) < 0.1:
+        return "Room temperature"
+    elif abs(celsius - 37) < 0.1:
+        return "Human body temperature"
+    elif abs(celsius - 100) < 0.1:
+        return "Boiling point of water"
+    return None
+
+# Custom CSS for the 600px centered card and SaaS style
 st.markdown(
     f"""
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-      html, body, [class*="css"] {{
-        font-family: 'Inter', sans-serif;
-        color: {TEXT};
+      html, body, [class*="css"], .stMarkdown, p, h1, h2, h3, label {{
+        font-family: 'Inter', sans-serif !important;
+        color: {TEXT} !important;
       }}
 
       .stApp {{
         background: {BG};
       }}
 
+      /* Center and constraint main container */
       .block-container {{
-        padding-top: 2.25rem;
-        padding-bottom: 3rem;
-        max-width: 900px;
+        max-width: 600px !important;
+        padding-top: 2rem;
       }}
 
-      .header {{
+      .calc-card {{
         background: {SURFACE};
         border: 1px solid {BORDER};
-        border-radius: 16px;
-        padding: 18px 20px;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-        margin-bottom: 16px;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
       }}
-      .header h1 {{
-        margin: 0;
-        font-size: 1.35rem;
+
+      .title {{
+        font-size: 1.5rem;
         font-weight: 700;
+        margin-bottom: 8px;
         letter-spacing: -0.02em;
-      }}
-      .header p {{
-        margin: 6px 0 0 0;
-        color: {MUTED};
-        font-size: 0.95rem;
+        text-align: center;
       }}
 
-      .card {{
-        background: {SURFACE};
-        border: 1px solid {BORDER};
-        border-radius: 16px;
-        padding: 16px;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
-        margin-top: 14px;
+      .section-divider {{
+        height: 1px;
+        background: {BORDER};
+        margin: 24px 0;
       }}
 
       .result-box {{
         background: {BG};
         border: 1px solid {BORDER};
-        border-radius: 14px;
-        padding: 14px 14px;
-        margin-top: 10px;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 12px;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
       }}
 
-      .result-label {{
-        color: {MUTED};
-        font-size: 0.9rem;
-        margin-bottom: 6px;
-      }}
-
-      .result-value {{
-        color: {TEXT};
-        font-size: 1.8rem;
+      .result-val {{
+        font-size: 1.75rem;
         font-weight: 700;
+        color: {TEXT};
       }}
 
-      .pill {{
-        display: inline-flex;
-        align-items: center;
-        padding: 2px 10px;
-        border-radius: 999px;
-        border: 1px solid rgba(249, 115, 22, 0.30);
-        background: rgba(249, 115, 22, 0.10);
-        color: {TEXT};
-        font-size: 0.85rem;
-        font-weight: 600;
+      .context-msg {{
+        color: {ACCENT};
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-top: 4px;
+      }}
+
+      @keyframes fadeIn {{
+        from {{ opacity: 0; transform: translateY(4px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
       }}
 
       /* Inputs */
-      .stNumberInput input {{
-        border-radius: 12px !important;
+      .stNumberInput div[data-baseweb="input"] {{
+        border-radius: 10px !important;
         border: 1px solid {BORDER} !important;
         background: {BG} !important;
+      }}
+      .stNumberInput input {{
+        color: {TEXT} !important;
+      }}
+      /* Remove red border on focus/error if any */
+      .stNumberInput div[data-baseweb="input"]:focus-within {{
+        border-color: {ACCENT} !important;
+        box-shadow: none !important;
       }}
 
       /* Buttons */
       .stButton > button {{
-        border-radius: 12px;
+        border-radius: 10px;
         border: 1px solid {BORDER};
         background: {BG};
         color: {TEXT};
-        padding: 0.6rem 0.85rem;
-        font-weight: 650;
+        padding: 0.6rem 1rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        margin-top: 8px;
+        width: 100%;
       }}
       .stButton > button:hover {{
-        border-color: rgba(249, 115, 22, 0.35);
-        background: rgba(249, 115, 22, 0.06);
+        border-color: {ACCENT};
+        background: rgba(34, 197, 94, 0.04);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.08);
       }}
 
-      /* Hide Streamlit branding */
-      #MainMenu {{visibility: hidden;}}
-      footer {{visibility: hidden;}}
-      .stDeployButton {{display: none;}}
+      /* Hide Streamlit elements */
+      #MainMenu, footer, .stDeployButton {{visibility: hidden;}}
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Header
-st.markdown(
-    """
-    <div class="header">
-        <h1>Temperature Converter</h1>
-        <p>Convert between Celsius and Fahrenheit.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+# App Content
+st.markdown('<div class="calc-card">', unsafe_allow_html=True)
+st.markdown('<h1 class="title">Temperature Converter</h1>', unsafe_allow_html=True)
+st.markdown(f'<p style="text-align:center; color:{MUTED}; margin-bottom:24px;">Simple, professional temperature tools</p>', unsafe_allow_html=True)
 
-# Conversion functions
-def celsius_to_fahrenheit(celsius):
-    return (celsius * 9/5) + 32
-
-def fahrenheit_to_celsius(fahrenheit):
-    return (fahrenheit - 32) * 5/9
-
-# Main converter
-st.markdown('<div class="card">', unsafe_allow_html=True)
-col1, col2 = st.columns(2, gap="large")
-
-with col1:
-    st.markdown("#### Celsius to Fahrenheit")
-    celsius_input = st.number_input("Celsius (°C)", value=0.0, step=1.0, format="%.2f", key="celsius")
-    if st.button("Convert", key="c_to_f", use_container_width=True):
-        fahrenheit_result = celsius_to_fahrenheit(celsius_input)
-        st.markdown(
-            f"""
-            <div class="result-box">
-              <div class="result-label">Result</div>
-              <div class="result-value">{fahrenheit_result:.2f}°F</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-with col2:
-    st.markdown("#### Fahrenheit to Celsius")
-    fahrenheit_input = st.number_input("Fahrenheit (°F)", value=32.0, step=1.0, format="%.2f", key="fahrenheit")
-    if st.button("Convert", key="f_to_c", use_container_width=True):
-        celsius_result = fahrenheit_to_celsius(fahrenheit_input)
-        st.markdown(
-            f"""
-            <div class="result-box">
-              <div class="result-label">Result</div>
-              <div class="result-value">{celsius_result:.2f}°C</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-with st.expander("Reference", expanded=False):
+# 1. Celsius to Fahrenheit
+st.markdown("### Celsius → Fahrenheit")
+c_val = st.number_input("Celsius (°C)", value=0.0, step=1.0, format="%.1f", key="c_in")
+if st.button("Convert to Fahrenheit", key="c_btn"):
+    f_res = (c_val * 9/5) + 32
+    ctx = get_temp_context(c_val)
     st.markdown(
         f"""
-        <div class="card" style="margin-top:0;">
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-            <span class="pill">Common points</span>
-          </div>
-          <ul style="margin:0; padding-left:1.2rem; color:{MUTED}; line-height:1.8;">
-            <li>-40°C = -40°F</li>
-            <li>0°C = 32°F (water freezes)</li>
-            <li>25°C = 77°F (room temperature)</li>
-            <li>37°C = 98.6°F (body temperature)</li>
-            <li>100°C = 212°F (water boils)</li>
-          </ul>
-          <div style="margin-top:14px; color:{MUTED};">
-            <div><strong style="color:{TEXT};">C → F</strong>: °F = (°C × 9/5) + 32</div>
-            <div><strong style="color:{TEXT};">F → C</strong>: °C = (°F − 32) × 5/9</div>
-          </div>
+        <div class="result-box">
+            <div class="result-val">{f_res:.1f}°F</div>
+            {f'<div class="context-msg">{ctx}</div>' if ctx else ""}
         </div>
-        """,
-        unsafe_allow_html=True,
+        """, 
+        unsafe_allow_html=True
     )
+
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+
+# 2. Fahrenheit to Celsius
+st.markdown("### Fahrenheit → Celsius")
+f_val = st.number_input("Fahrenheit (°F)", value=32.0, step=1.0, format="%.1f", key="f_in")
+if st.button("Convert to Celsius", key="f_btn"):
+    c_res = (f_val - 32) * 5/9
+    ctx = get_temp_context(c_res)
+    st.markdown(
+        f"""
+        <div class="result-box">
+            <div class="result-val">{c_res:.1f}°C</div>
+            {f'<div class="context-msg">{ctx}</div>' if ctx else ""}
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
+
+st.markdown('</div>', unsafe_allow_html=True)

@@ -4,6 +4,7 @@ let currentPlayer = 'X';
 let gameActive = true;
 let playerScore = 0;
 let aiScore = 0;
+let difficulty = 'hard';
 
 // DOM elements
 const cells = document.querySelectorAll('.cell');
@@ -12,6 +13,7 @@ const resetBtn = document.getElementById('resetBtn');
 const resetScoreBtn = document.getElementById('resetScoreBtn');
 const playerScoreEl = document.getElementById('playerScore');
 const aiScoreEl = document.getElementById('aiScore');
+const difficultyBtns = document.querySelectorAll('.difficulty-btn');
 
 // Winning combinations
 const winningConditions = [
@@ -29,6 +31,14 @@ const winningConditions = [
 function init() {
     cells.forEach(cell => {
         cell.addEventListener('click', handleCellClick);
+    });
+    difficultyBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            difficulty = btn.getAttribute('data-level');
+            difficultyBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            resetGame();
+        });
     });
     resetBtn.addEventListener('click', resetGame);
     resetScoreBtn.addEventListener('click', resetScore);
@@ -117,12 +127,48 @@ function checkResult() {
     }
 }
 
-// AI Move using Minimax Algorithm
+// AI Move based on difficulty
 function aiMove() {
     if (!gameActive) return;
     
-    const bestMove = findBestMove();
-    makeMove(bestMove, 'O');
+    let move;
+    if (difficulty === 'easy') {
+        move = findRandomMove();
+    } else if (difficulty === 'medium') {
+        move = findMediumMove();
+    } else {
+        move = findBestMove(); // Hard (Minimax)
+    }
+    
+    makeMove(move, 'O');
+}
+
+// Easy: Random Move
+function findRandomMove() {
+    const available = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+    return available[Math.floor(Math.random() * available.length)];
+}
+
+// Medium: Block Win or Random
+function findMediumMove() {
+    // 1. Try to win if possible
+    for (let i = 0; i < winningConditions.length; i++) {
+        const [a, b, c] = winningConditions[i];
+        const vals = [board[a], board[b], board[c]];
+        if (vals.filter(v => v === 'O').length === 2 && vals.includes('')) {
+            return [a, b, c][vals.indexOf('')];
+        }
+    }
+    // 2. Block player win
+    for (let i = 0; i < winningConditions.length; i++) {
+        const [a, b, c] = winningConditions[i];
+        const vals = [board[a], board[b], board[c]];
+        if (vals.filter(v => v === 'X').length === 2 && vals.includes('')) {
+            return [a, b, c][vals.indexOf('')];
+        }
+    }
+    // 3. Random
+    return findRandomMove();
 }
 
 // Minimax Algorithm
