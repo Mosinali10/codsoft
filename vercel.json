@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm install --prefix codsoft-web/client && npm run build --prefix codsoft-web/client",
-  "outputDirectory": "codsoft-web/client/dist",
-  "installCommand": "echo 'Skipping root install'",
+  "framework": "vite",
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
   "rewrites": [
     {
       "source": "/api/chat",
