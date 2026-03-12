@@ -7,10 +7,13 @@ const Layout = ({ children }) => {
       <Navbar />
       <main style={{ 
         flex: 1, 
-        padding: '3rem 1.5rem', 
+        padding: '0.5rem 1rem', 
         display: 'flex', 
         flexDirection: 'column', 
-        alignItems: 'center' 
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 57px)',
+        overflow: 'auto'
       }}>
         {children}
       </main>

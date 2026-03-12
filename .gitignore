@@ -81,3 +81,34 @@ Thumbs.db
 *.temp
 *.bak
 *.swp
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Vercel
+.vercel
+
+# Netlify
+.netlify
+
+# Cache
+.cache/
+.parcel-cache/
+.vite/

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Card from '../components/Card';
 import { Search, Loader2, Info, Star, Film, Tag, Calendar } from 'lucide-react';
+import { getRecommendations, getAutocompleteSuggestions } from '../utils/movieRecommender';
 
 /* ─── Project Label ─── */
 const ProjectLabel = ({ text }) => (
@@ -20,7 +21,7 @@ const MovieInsightsPanel = ({ movie }) => {
   if (!movie) return null;
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: 'var(--surface)',
       border: '1px solid var(--border)',
       borderRadius: '14px',
       padding: '1.25rem 1.5rem',
@@ -76,7 +77,7 @@ const RecommendationCard = ({ movie }) => {
   return (
     <div style={{
       padding: '1.25rem',
-      backgroundColor: 'white',
+      backgroundColor: 'var(--surface)',
       borderRadius: '14px',
       border: '1px solid var(--border)',
       display: 'flex',
@@ -134,11 +135,15 @@ const MovieRecommender = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionRef = useRef(null);
 
-  // Debounced suggestions
+  // Debounced autocomplete suggestions
   useEffect(() => {
     const timer = setTimeout(() => {
       if (title.length >= 2) {
-        fetchSuggestions();
+        setSearchingSuggestions(true);
+        const autocompleteSuggestions = getAutocompleteSuggestions(title);
+        setSuggestions(autocompleteSuggestions);
+        setShowSuggestions(autocompleteSuggestions.length > 0);
+        setSearchingSuggestions(false);
       } else {
         setSuggestions([]);
         setShowSuggestions(false);
@@ -158,38 +163,18 @@ const MovieRecommender = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const fetchSuggestions = async () => {
-    setSearchingSuggestions(true);
-    try {
-      const response = await fetch(`/api/recommend/suggestions?q=${title}`);
-      const data = await response.json();
-      setSuggestions(data);
-      setShowSuggestions(data.length > 0);
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-    } finally {
-      setSearchingSuggestions(false);
-    }
-  };
-
-  const handleRecommend = async (overrideTitle) => {
+  const handleRecommend = (overrideTitle) => {
     const searchTitle = overrideTitle || title;
     if (!searchTitle.trim()) return;
     setLoading(true);
     setShowSuggestions(false);
-    try {
-      const response = await fetch('/api/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: searchTitle }),
-      });
-      const data = await response.json();
-      setResults(data);
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
-    } finally {
+    
+    // Simulate a small delay for better UX
+    setTimeout(() => {
+      const recommendationResults = getRecommendations(searchTitle, 6);
+      setResults(recommendationResults);
       setLoading(false);
-    }
+    }, 300);
   };
 
   const highlightMatch = (text, query) => {
@@ -226,7 +211,7 @@ const MovieRecommender = () => {
                 fontSize: '1rem',
                 outline: 'none',
                 transition: 'border-color 0.2s',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--surface)',
                 boxSizing: 'border-box'
               }}
             />
@@ -270,7 +255,7 @@ const MovieRecommender = () => {
             top: '54px',
             left: 0,
             right: 0,
-            backgroundColor: 'white',
+            backgroundColor: 'var(--surface)',
             borderRadius: '12px',
             border: '1px solid var(--border)',
             boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
@@ -311,7 +296,7 @@ const MovieRecommender = () => {
         <div style={{ marginTop: '1.5rem' }}>
 
           {/* ── Did-you-mean / correction banner ── */}
-          {results?.correctedTitle && results?.didYouMean && (
+          {results?.found && results?.selectedMovie && (
             <div style={{
               display: 'flex',
               gap: '12px',
@@ -326,16 +311,18 @@ const MovieRecommender = () => {
             }}>
               <Info size={20} color="var(--accent)" />
               <div>
-                Showing results for <strong>{results.correctedTitle}</strong>
-                <span style={{ color: 'var(--muted)', marginLeft: '8px', fontSize: '0.8125rem' }}>
-                  (Confidence: {Math.round((results.confidenceScore || 0) * 100)}%)
-                </span>
+                Showing results for <strong>{results.selectedMovie.title}</strong>
+                {results.confidenceScore && (
+                  <span style={{ color: 'var(--muted)', marginLeft: '8px', fontSize: '0.8125rem' }}>
+                    (Match: {Math.round(results.confidenceScore * 100)}%)
+                  </span>
+                )}
               </div>
             </div>
           )}
 
           {/* ── Did-you-mean pill suggestions ── */}
-          {!results?.correctedTitle && (results?.suggestions?.length ?? 0) > 0 && (
+          {!results?.found && (results?.suggestions?.length ?? 0) > 0 && (
             <div style={{
               padding: '1rem',
               backgroundColor: 'var(--surface)',
@@ -358,7 +345,7 @@ const MovieRecommender = () => {
                       padding: '4px 12px',
                       borderRadius: '20px',
                       border: '1px solid var(--border)',
-                      backgroundColor: 'white',
+                      backgroundColor: 'var(--surface)',
                       fontSize: '0.8125rem',
                       color: 'var(--accent)',
                       fontWeight: 500,

@@ -4,11 +4,12 @@ import { Send, RefreshCcw } from 'lucide-react';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([
-    { text: "Hello! I'm your SaaS Assistant. How can I help you today?", sender: 'bot' }
+    { text: "Hello! I'm your AI Assistant. I can tell jokes, give quizzes, do math, share fun facts, and more! Type 'help' to see what I can do! 😊", sender: 'bot' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef(null);
+  const sessionId = useRef(Math.random().toString(36).substring(7));
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -28,7 +29,7 @@ const Chatbot = () => {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg })
+        body: JSON.stringify({ message: userMsg, sessionId: sessionId.current })
       });
       const data = await res.json();
       
@@ -44,7 +45,8 @@ const Chatbot = () => {
   };
 
   const clearChat = () => {
-    setMessages([{ text: "Hello! I'm your SaaS Assistant. How can I help you today?", sender: 'bot' }]);
+    setMessages([{ text: "Hello! I'm your AI Assistant. I can tell jokes, give quizzes, do math, share fun facts, and more! Type 'help' to see what I can do! 😊", sender: 'bot' }]);
+    sessionId.current = Math.random().toString(36).substring(7); // New session
   };
 
   return (
@@ -56,16 +58,16 @@ const Chatbot = () => {
       <div 
         ref={scrollRef}
         style={{ 
-          height: '400px', 
+          height: '350px', 
           overflowY: 'auto', 
           padding: '10px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '1rem',
-          backgroundColor: 'white',
+          gap: '0.75rem',
+          backgroundColor: 'var(--surface)',
           borderRadius: '12px',
           border: '1px solid var(--border)',
-          marginBottom: '1rem'
+          marginBottom: '0.75rem'
         }}
       >
         {messages.map((msg, i) => (
@@ -99,7 +101,7 @@ const Chatbot = () => {
             padding: '10px', 
             borderRadius: '10px', 
             border: '1px solid var(--border)',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--surface)',
             color: 'var(--muted)'
           }}
         >
@@ -141,7 +143,7 @@ const Chatbot = () => {
         textAlign: 'center',
         fontSize: '0.75rem',
         color: 'var(--muted)',
-        marginTop: '1.5rem',
+        marginTop: '1rem',
         letterSpacing: '0.02em'
       }}>
         AI Chatbot Assistant — CodSoft Internship Project

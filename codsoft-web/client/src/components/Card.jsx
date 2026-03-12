@@ -5,15 +5,15 @@ const Card = ({ children, title, subtitle, maxWidth = '100%' }) => {
     <div style={{
       maxWidth: maxWidth,
       width: '100%',
-      backgroundColor: 'var(--surface)',
+      backgroundColor: 'var(--card-bg)',
       border: '1px solid var(--border)',
       borderRadius: '20px',
-      padding: '2rem',
-      boxShadow: '0 4px 15px rgba(15, 23, 42, 0.04)',
+      padding: '1.25rem',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
       margin: '0 auto'
     }}>
-      {title && <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem', textAlign: 'center' }}>{title}</h2>}
-      {subtitle && <p style={{ color: 'var(--muted)', fontSize: '0.9375rem', textAlign: 'center', marginBottom: '1.5rem' }}>{subtitle}</p>}
+      {title && <h2 style={{ fontSize: '1.375rem', fontWeight: 700, marginBottom: '0.25rem', textAlign: 'center' }}>{title}</h2>}
+      {subtitle && <p style={{ color: 'var(--muted)', fontSize: '0.875rem', textAlign: 'center', marginBottom: '1rem' }}>{subtitle}</p>}
       {children}
     </div>
   );

@@ -1,13 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --background: #FFFFFF;
-  --surface: #F8FAFC;
-  --text: #0F172A;
-  --border: #E2E8F0;
+  --background: #F8F9FA;
+  --surface: #FFFFFF;
+  --text: #1F2937;
+  --border: #E5E7EB;
   --accent: #22C55E;
-  --muted: #64748B;
+  --muted: #6B7280;
   --shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --card-bg: #FAFBFC;
 }
 
 * {
