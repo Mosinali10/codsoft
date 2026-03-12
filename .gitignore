@@ -104,6 +104,7 @@ out/
 
 # Vercel
 .vercel
+!vercel.json
 
 # Netlify
 .netlify
