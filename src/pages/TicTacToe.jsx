@@ -535,7 +535,7 @@ const TicTacToe = () => {
         width: 'fit-content'
       }}>
         {board.map((cell, i) => {
-          const isWinningCell = winningLine && winningLine.includes(i);
+          const isWinningCell = winningLine && winningLine.includes(i) && cell !== null;
           const isLastMove = lastMoveIndex === i;
           return (
             <button
@@ -563,13 +563,15 @@ const TicTacToe = () => {
               }}
               onMouseEnter={(e) => {
                 if (isPlayerTurn && !winner && !isAiThinking && !cell) {
-                  e.target.style.backgroundColor = 'var(--surface)';
+                  e.target.style.backgroundColor = 'var(--border)';
                   e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.08)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'white';
-                e.target.style.boxShadow = '0 2px 5px rgba(0,0,0,0.02)';
+                if (!isWinningCell) {
+                  e.target.style.backgroundColor = 'var(--surface)';
+                  e.target.style.boxShadow = cell ? '0 2px 5px rgba(0,0,0,0.02)' : '0 2px 5px rgba(0,0,0,0.02)';
+                }
               }}
             >
               {cell}
