@@ -188,9 +188,10 @@ const MovieRecommender = () => {
   };
 
   return (
-    <Card
-      title="Movie Recommender"
-      subtitle="Find your next favorite film with our smart AI engine"
+    <div className="page-container">
+      <Card
+        title="Movie Recommender"
+        subtitle="Find your next favorite film with our smart AI engine"
       maxWidth="820px"
     >
       {/* ── 1. SEARCH BAR ── */}
@@ -415,6 +416,7 @@ const MovieRecommender = () => {
       {/* ── Project Label ── */}
       <ProjectLabel text="Movie Recommendation Engine — CodSoft Internship Project" />
     </Card>
+    </div>
   );
 };
 

@@ -1,15 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Card from '../components/Card';
-import { Send, RefreshCcw } from 'lucide-react';
+import { Send, RefreshCcw, Plus, MessageSquare, Bot } from 'lucide-react';
+
+const SYSTEM_PROMPT = "You are a helpful AI assistant. Be concise and friendly.";
+
+const SUGGESTIONS = [
+  "Explain machine learning in simple terms",
+  "What is the Minimax algorithm?",
+  "How does TF-IDF work?",
+  "Write a Python hello world",
+];
 
 const Chatbot = () => {
-  const [messages, setMessages] = useState([
-    { text: "Hello! I'm your AI Assistant. I can tell jokes, give quizzes, do math, share fun facts, and more! Type 'help' to see what I can do! 😊", sender: 'bot' }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [sessions, setSessions] = useState([
+    { id: 1, title: 'New Chat', active: true },
+  ]);
   const scrollRef = useRef(null);
-  const sessionId = useRef(Math.random().toString(36).substring(7));
+  const historyRef = useRef([]);
+  const inputRef = useRef(null);
+
+  const isEmptyChat = messages.length === 0;
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -17,138 +29,175 @@ const Chatbot = () => {
     }
   }, [messages, isTyping]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (text) => {
+    const userText = (text || input).trim();
+    if (!userText || isTyping) return;
 
-    const userMsg = input.trim();
     setInput('');
-    setMessages(prev => [...prev, { text: userMsg, sender: 'user' }]);
+    setMessages(prev => [...prev, { role: 'user', text: userText }]);
     setIsTyping(true);
 
+    historyRef.current = [...historyRef.current, { role: 'user', content: userText }];
+
+    // update session title from first message
+    setSessions(prev => prev.map(s =>
+      s.active && s.title === 'New Chat'
+        ? { ...s, title: userText.slice(0, 28) + (userText.length > 28 ? '…' : '') }
+        : s
+    ));
+
     try {
-      const res = await fetch('/api/chat', {
+      const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+      if (!apiKey) throw new Error('VITE_GROQ_API_KEY is not set.');
+
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg, sessionId: sessionId.current })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            ...historyRef.current
+          ]
+        })
       });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `API error ${res.status}`);
+      }
+
       const data = await res.json();
-      
-      // Artificial delay for realism
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: data.response, sender: 'bot' }]);
-        setIsTyping(false);
-      }, 600);
+      const reply = data.choices[0].message.content;
+      historyRef.current = [...historyRef.current, { role: 'assistant', content: reply }];
+      setMessages(prev => [...prev, { role: 'assistant', text: reply }]);
     } catch (err) {
+      setMessages(prev => [...prev, { role: 'assistant', text: `⚠️ ${err.message}` }]);
+    } finally {
       setIsTyping(false);
-      setMessages(prev => [...prev, { text: "Sorry, I'm having trouble connecting to the server.", sender: 'bot' }]);
     }
   };
 
-  const clearChat = () => {
-    setMessages([{ text: "Hello! I'm your AI Assistant. I can tell jokes, give quizzes, do math, share fun facts, and more! Type 'help' to see what I can do! 😊", sender: 'bot' }]);
-    sessionId.current = Math.random().toString(36).substring(7); // New session
+  const newChat = () => {
+    historyRef.current = [];
+    setMessages([]);
+    setInput('');
+    const newId = Date.now();
+    setSessions(prev => [
+      ...prev.map(s => ({ ...s, active: false })),
+      { id: newId, title: 'New Chat', active: true }
+    ]);
+    inputRef.current?.focus();
   };
 
   return (
-    <Card 
-      title="SaaS Chatbot" 
-      subtitle="Intelligent keyword-based assistance"
-      maxWidth="600px"
-    >
-      <div 
-        ref={scrollRef}
-        style={{ 
-          height: '350px', 
-          overflowY: 'auto', 
-          padding: '10px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem',
-          backgroundColor: 'var(--surface)',
-          borderRadius: '12px',
-          border: '1px solid var(--border)',
-          marginBottom: '0.75rem'
-        }}
-      >
-        {messages.map((msg, i) => (
-          <div 
-            key={i} 
-            style={{ 
-              alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '80%',
-              padding: '0.75rem 1rem',
-              borderRadius: msg.sender === 'user' ? '14px 14px 2px 14px' : '14px 14px 14px 2px',
-              backgroundColor: msg.sender === 'user' ? 'var(--accent)' : 'var(--surface)',
-              color: msg.sender === 'user' ? 'white' : 'var(--text)',
-              fontSize: '0.9375rem',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-            }}
-          >
-            {msg.text}
-          </div>
-        ))}
-        {isTyping && (
-          <div style={{ alignSelf: 'flex-start', color: 'var(--muted)', fontSize: '0.8125rem', fontStyle: 'italic' }}>
-            Assistant is typing...
-          </div>
-        )}
-      </div>
+    <div className="chat-page">
 
-      <div style={{ display: 'flex', gap: '0.75rem' }}>
-        <button 
-          onClick={clearChat}
-          style={{ 
-            padding: '10px', 
-            borderRadius: '10px', 
-            border: '1px solid var(--border)',
-            backgroundColor: 'var(--surface)',
-            color: 'var(--muted)'
-          }}
-        >
-          <RefreshCcw size={20} />
+      {/* ── Left sidebar ── */}
+      <aside className="chat-sidebar">
+        <button className="chat-new-btn" onClick={newChat}>
+          <Plus size={15} /> New Chat
         </button>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <input 
-            type="text" 
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask me anything..."
-            style={{
-              width: '100%',
-              padding: '0.75rem 3rem 0.75rem 1rem',
-              borderRadius: '10px',
-              border: '1px solid var(--border)',
-              outline: 'none'
-            }}
-          />
-          <button 
-            onClick={handleSend}
-            style={{
-              position: 'absolute',
-              right: '8px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              backgroundColor: 'transparent',
-              border: 'none',
-              color: 'var(--accent)'
-            }}
-          >
-            <Send size={20} />
+
+        <p className="chat-sidebar-label">Recent chats</p>
+
+        <div className="chat-session-list">
+          {sessions.slice().reverse().map(s => (
+            <div
+              key={s.id}
+              className={`chat-session-item${s.active ? ' active' : ''}`}
+              onClick={() => setSessions(prev => prev.map(x => ({ ...x, active: x.id === s.id })))}
+            >
+              <MessageSquare size={13} />
+              <span>{s.title}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="chat-sidebar-footer">
+          <Bot size={14} />
+          <span>Llama 3.3 · 70B</span>
+        </div>
+      </aside>
+
+      {/* ── Main chat area ── */}
+      <div className="chat-main">
+
+        {/* header */}
+        <div className="chat-main-header">
+          <div className="chat-main-title">
+            {sessions.find(s => s.active)?.title || 'New Chat'}
+          </div>
+          <button className="chat-clear-btn" onClick={newChat} title="New chat">
+            <RefreshCcw size={15} />
           </button>
         </div>
-      </div>
 
-      <p style={{
-        textAlign: 'center',
-        fontSize: '0.75rem',
-        color: 'var(--muted)',
-        marginTop: '1rem',
-        letterSpacing: '0.02em'
-      }}>
-        AI Chatbot Assistant — CodSoft Internship Project
-      </p>
-    </Card>
+        {/* messages or welcome */}
+        <div ref={scrollRef} className="chat-messages">
+          {isEmptyChat ? (
+            <div className="chat-welcome">
+              <div className="chat-welcome-icon">
+                <Bot size={32} />
+              </div>
+              <h2 className="chat-welcome-title">Let's get started</h2>
+              <p className="chat-welcome-sub">
+                An AI-powered assistant — ask me anything.
+              </p>
+              <div className="chat-suggestions">
+                {SUGGESTIONS.map(s => (
+                  <button key={s} className="chat-suggestion-btn" onClick={() => handleSend(s)}>
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {messages.map((msg, i) => (
+                <div key={i} className={`chat-bubble ${msg.role}`}>
+                  {msg.role === 'assistant' && (
+                    <div className="chat-bubble-avatar"><Bot size={14} /></div>
+                  )}
+                  <div className="chat-bubble-text">{msg.text}</div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="chat-bubble assistant">
+                  <div className="chat-bubble-avatar"><Bot size={14} /></div>
+                  <div className="chat-typing"><span /><span /><span /></div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* input bar */}
+        <div className="chat-input-bar">
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSend()}
+            placeholder="Type your message here..."
+            disabled={isTyping}
+            className="chat-input-field"
+          />
+          <button
+            onClick={() => handleSend()}
+            disabled={isTyping || !input.trim()}
+            className="chat-send-fab"
+          >
+            <Send size={17} />
+          </button>
+        </div>
+
+      </div>
+    </div>
   );
 };
 

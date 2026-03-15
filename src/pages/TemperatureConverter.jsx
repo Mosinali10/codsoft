@@ -1,280 +1,145 @@
 import React, { useState } from 'react';
-import Card from '../components/Card';
-import { ArrowDownUp, X } from 'lucide-react';
+import { ArrowDownUp, X, Thermometer } from 'lucide-react';
+
+const REFS = [
+  { emoji: '❄️', label: 'Freezing',  c: 0,   f: 32,    k: 273.15 },
+  { emoji: '🏠', label: 'Room Temp', c: 20,  f: 68,    k: 293.15 },
+  { emoji: '🌡️', label: 'Body Temp', c: 37,  f: 98.6,  k: 310.15 },
+  { emoji: '🔥', label: 'Boiling',   c: 100, f: 212,   k: 373.15 },
+];
 
 const TemperatureConverter = () => {
-  const [celsius, setCelsius] = useState('0');
+  const [celsius,    setCelsius]    = useState('0');
   const [fahrenheit, setFahrenheit] = useState('32');
-  const [kelvin, setKelvin] = useState('273.15');
-  const [activeInput, setActiveInput] = useState('celsius');
+  const [kelvin,     setKelvin]     = useState('273.15');
+  const [active,     setActive]     = useState('celsius');
 
-  const handleCelsiusChange = (e) => {
-    const val = e.target.value;
-    setCelsius(val);
-    setActiveInput('celsius');
-    if (val === '') {
-      setFahrenheit('');
-      setKelvin('');
-    } else {
-      const num = parseFloat(val);
-      if (isNaN(num)) {
-        setFahrenheit('');
-        setKelvin('');
-      } else {
-        const f = (num * 9/5) + 32;
-        const k = num + 273.15;
-        setFahrenheit(f.toFixed(2));
-        setKelvin(k.toFixed(2));
-      }
-    }
+  const fromC = (c) => ({ f: (c * 9/5 + 32).toFixed(2), k: (c + 273.15).toFixed(2) });
+  const fromF = (f) => { const c = (f - 32) * 5/9; return { c: c.toFixed(2), k: (c + 273.15).toFixed(2) }; };
+  const fromK = (k) => { const c = k - 273.15; return { c: c.toFixed(2), f: (c * 9/5 + 32).toFixed(2) }; };
+
+  const handleC = (e) => {
+    const v = e.target.value; setCelsius(v); setActive('celsius');
+    const n = parseFloat(v);
+    if (v === '' || isNaN(n)) { setFahrenheit(''); setKelvin(''); }
+    else { const r = fromC(n); setFahrenheit(r.f); setKelvin(r.k); }
+  };
+  const handleF = (e) => {
+    const v = e.target.value; setFahrenheit(v); setActive('fahrenheit');
+    const n = parseFloat(v);
+    if (v === '' || isNaN(n)) { setCelsius(''); setKelvin(''); }
+    else { const r = fromF(n); setCelsius(r.c); setKelvin(r.k); }
+  };
+  const handleK = (e) => {
+    const v = e.target.value; setKelvin(v); setActive('kelvin');
+    const n = parseFloat(v);
+    if (v === '' || isNaN(n)) { setCelsius(''); setFahrenheit(''); }
+    else { const r = fromK(n); setCelsius(r.c); setFahrenheit(r.f); }
   };
 
-  const handleFahrenheitChange = (e) => {
-    const val = e.target.value;
-    setFahrenheit(val);
-    setActiveInput('fahrenheit');
-    if (val === '') {
-      setCelsius('');
-      setKelvin('');
-    } else {
-      const num = parseFloat(val);
-      if (isNaN(num)) {
-        setCelsius('');
-        setKelvin('');
-      } else {
-        const c = (num - 32) * 5/9;
-        const k = c + 273.15;
-        setCelsius(c.toFixed(2));
-        setKelvin(k.toFixed(2));
-      }
-    }
+  const swap = () => {
+    const tmp = celsius; setCelsius(fahrenheit); setFahrenheit(tmp);
+    setActive(active === 'celsius' ? 'fahrenheit' : 'celsius');
   };
 
-  const handleKelvinChange = (e) => {
-    const val = e.target.value;
-    setKelvin(val);
-    setActiveInput('kelvin');
-    if (val === '') {
-      setCelsius('');
-      setFahrenheit('');
-    } else {
-      const num = parseFloat(val);
-      if (isNaN(num)) {
-        setCelsius('');
-        setFahrenheit('');
-      } else {
-        const c = num - 273.15;
-        const f = (c * 9/5) + 32;
-        setCelsius(c.toFixed(2));
-        setFahrenheit(f.toFixed(2));
-      }
-    }
-  };
+  const clearAll = () => { setCelsius(''); setFahrenheit(''); setKelvin(''); setActive('celsius'); };
 
-  const swapCelsiusFahrenheit = () => {
-    const temp = celsius;
-    setCelsius(fahrenheit);
-    setFahrenheit(temp);
-    setActiveInput(activeInput === 'celsius' ? 'fahrenheit' : 'celsius');
-  };
-
-  const clearAll = () => {
-    setCelsius('');
-    setFahrenheit('');
-    setKelvin('');
-    setActiveInput('celsius');
-  };
-
-  const getInputStyle = (isActive) => ({
-    width: '100%',
-    padding: '0.875rem 1rem',
-    borderRadius: '10px',
-    border: `2px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-    fontSize: '1.125rem',
-    fontWeight: isActive ? '600' : '400',
-    outline: 'none',
-    transition: 'all 0.2s',
-    backgroundColor: isActive ? 'var(--surface)' : 'var(--card-bg)',
-    boxShadow: isActive ? '0 0 0 3px rgba(59, 130, 246, 0.1)' : 'none'
-  });
-
-  const labelStyle = {
-    display: 'block',
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: 'var(--text)',
-    marginBottom: '0.5rem'
-  };
-
-  const containerStyle = {
-    position: 'relative',
-    marginBottom: '0.75rem'
+  const applyRef = (ref) => {
+    setCelsius(String(ref.c)); setFahrenheit(String(ref.f)); setKelvin(String(ref.k));
+    setActive('celsius');
   };
 
   return (
-    <Card 
-      title="Temperature Converter" 
-      subtitle="Real-time conversion between Celsius, Fahrenheit, and Kelvin"
-      maxWidth="500px"
-    >
-      <style>{`
-        @keyframes rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(180deg); }
-        }
-        .swap-btn:hover svg {
-          animation: rotate 0.3s ease-in-out;
-        }
-      `}</style>
+    <div className="temp-page">
 
-      <div style={containerStyle}>
-        <label style={labelStyle}>Celsius (°C)</label>
-        <input 
-          type="number" 
-          value={celsius} 
-          onChange={handleCelsiusChange}
-          onFocus={() => setActiveInput('celsius')}
-          placeholder="Enter temperature"
-          style={getInputStyle(activeInput === 'celsius')}
-          step="0.01"
-        />
-      </div>
+      {/* ── Left: converter ── */}
+      <div className="temp-converter-panel">
+        <div className="temp-panel-header">
+          <div className="temp-panel-icon"><Thermometer size={20} /></div>
+          <div>
+            <h2 className="temp-panel-title">Temperature Converter</h2>
+            <p className="temp-panel-sub">Real-time conversion between Celsius, Fahrenheit, and Kelvin</p>
+          </div>
+        </div>
 
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        gap: '0.75rem',
-        margin: '0.5rem 0'
-      }}>
-        <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }} />
-        <button
-          onClick={swapCelsiusFahrenheit}
-          className="swap-btn"
-          style={{
-            padding: '0.5rem',
-            borderRadius: '50%',
-            border: '1px solid var(--border)',
-            backgroundColor: 'var(--surface)',
-            color: 'var(--accent)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--accent)';
-            e.currentTarget.style.color = 'white';
-            e.currentTarget.style.transform = 'scale(1.1)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--surface)';
-            e.currentTarget.style.color = 'var(--accent)';
-            e.currentTarget.style.transform = 'scale(1)';
-          }}
-          title="Swap Celsius and Fahrenheit"
-        >
-          <ArrowDownUp size={18} />
+        <div className="temp-field">
+          <label className="temp-label">Celsius <span className="unit-badge">°C</span></label>
+          <input type="number" value={celsius} onChange={handleC} onFocus={() => setActive('celsius')}
+            placeholder="Enter temperature" step="0.01"
+            className={`temp-input${active === 'celsius' ? ' active' : ''}`} />
+        </div>
+
+        <div className="divider-row">
+          <div className="divider-line" />
+          <button onClick={swap} className="swap-btn" title="Swap °C ↔ °F"><ArrowDownUp size={16} /></button>
+          <div className="divider-line" />
+        </div>
+
+        <div className="temp-field">
+          <label className="temp-label">Fahrenheit <span className="unit-badge">°F</span></label>
+          <input type="number" value={fahrenheit} onChange={handleF} onFocus={() => setActive('fahrenheit')}
+            placeholder="Enter temperature" step="0.01"
+            className={`temp-input${active === 'fahrenheit' ? ' active' : ''}`} />
+        </div>
+
+        <div className="temp-field" style={{ marginTop: '0.875rem' }}>
+          <label className="temp-label">Kelvin <span className="unit-badge">K</span></label>
+          <input type="number" value={kelvin} onChange={handleK} onFocus={() => setActive('kelvin')}
+            placeholder="Enter temperature" step="0.01"
+            className={`temp-input${active === 'kelvin' ? ' active' : ''}`} />
+        </div>
+
+        <button onClick={clearAll} className="btn btn-ghost" style={{ width: '100%', marginTop: '1rem' }}>
+          <X size={15} /> Clear All
         </button>
-        <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }} />
+
+        <p className="project-label" style={{ marginTop: '1.25rem' }}>
+          Temperature Converter — CodSoft Internship Project
+        </p>
       </div>
 
-      <div style={containerStyle}>
-        <label style={labelStyle}>Fahrenheit (°F)</label>
-        <input 
-          type="number" 
-          value={fahrenheit} 
-          onChange={handleFahrenheitChange}
-          onFocus={() => setActiveInput('fahrenheit')}
-          placeholder="Enter temperature"
-          style={getInputStyle(activeInput === 'fahrenheit')}
-          step="0.01"
-        />
+      {/* ── Right: reference panel ── */}
+      <div className="temp-ref-panel">
+        <h3 className="temp-ref-title">Reference Points</h3>
+        <p className="temp-ref-sub">Click any card to apply values</p>
+
+        <div className="temp-ref-cards">
+          {REFS.map(ref => (
+            <button key={ref.label} className="temp-ref-card" onClick={() => applyRef(ref)}>
+              <span className="temp-ref-emoji">{ref.emoji}</span>
+              <div className="temp-ref-info">
+                <span className="temp-ref-label">{ref.label}</span>
+                <span className="temp-ref-vals">{ref.c}°C · {ref.f}°F · {ref.k} K</span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* live display */}
+        {celsius !== '' && !isNaN(parseFloat(celsius)) && (
+          <div className="temp-live-card">
+            <p className="temp-live-label">Current values</p>
+            <div className="temp-live-row">
+              <div className="temp-live-val">
+                <span className="temp-live-num">{celsius}</span>
+                <span className="temp-live-unit">°C</span>
+              </div>
+              <div className="temp-live-sep">=</div>
+              <div className="temp-live-val">
+                <span className="temp-live-num">{fahrenheit}</span>
+                <span className="temp-live-unit">°F</span>
+              </div>
+              <div className="temp-live-sep">=</div>
+              <div className="temp-live-val">
+                <span className="temp-live-num">{kelvin}</span>
+                <span className="temp-live-unit">K</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      <div style={containerStyle}>
-        <label style={labelStyle}>Kelvin (K)</label>
-        <input 
-          type="number" 
-          value={kelvin} 
-          onChange={handleKelvinChange}
-          onFocus={() => setActiveInput('kelvin')}
-          placeholder="Enter temperature"
-          style={getInputStyle(activeInput === 'kelvin')}
-          step="0.01"
-        />
-      </div>
-
-      <button
-        onClick={clearAll}
-        style={{
-          width: '100%',
-          padding: '0.75rem',
-          marginTop: '0.5rem',
-          borderRadius: '10px',
-          border: '1px solid var(--border)',
-          backgroundColor: 'var(--surface)',
-          color: 'var(--text)',
-          fontSize: '0.9rem',
-          fontWeight: 500,
-          cursor: 'pointer',
-          transition: 'all 0.2s',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.5rem'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--border)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--surface)';
-        }}
-      >
-        <X size={16} />
-        Clear All
-      </button>
-
-      <div style={{ 
-        marginTop: '1rem', 
-        padding: '0.875rem', 
-        backgroundColor: 'var(--surface)', 
-        borderRadius: '12px', 
-        border: '1px solid var(--border)' 
-      }}>
-        <h4 style={{ 
-          fontSize: '0.875rem', 
-          color: 'var(--text)', 
-          marginBottom: '0.5rem',
-          fontWeight: 600
-        }}>
-          Common Reference Points:
-        </h4>
-        <ul style={{ 
-          fontSize: '0.8125rem', 
-          color: 'var(--muted)', 
-          listStyle: 'none', 
-          padding: 0,
-          lineHeight: '1.8'
-        }}>
-          <li>❄️ 0°C = 32°F = 273.15K (Freezing)</li>
-          <li>🏠 20°C = 68°F = 293.15K (Room Temp)</li>
-          <li>🌡️ 37°C = 98.6°F = 310.15K (Body Temp)</li>
-          <li>🔥 100°C = 212°F = 373.15K (Boiling)</li>
-        </ul>
-      </div>
-
-      <p style={{
-        textAlign: 'center',
-        fontSize: '0.75rem',
-        color: 'var(--muted)',
-        marginTop: '1rem',
-        letterSpacing: '0.02em'
-      }}>
-        Temperature Intelligence Tool — CodSoft Internship Project
-      </p>
-    </Card>
+    </div>
   );
 };
 

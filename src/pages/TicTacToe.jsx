@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Card from '../components/Card';
 
 const TicTacToe = () => {
   // Game state
@@ -307,352 +306,149 @@ const TicTacToe = () => {
   // Render Player Selection Screen
   if (!gameStarted) {
     return (
-      <Card 
-        title="Tic Tac Toe AI" 
-        subtitle="Choose your symbol to begin"
-        maxWidth="460px"
-      >
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ 
-            marginBottom: '1.5rem',
-            fontSize: '0.95rem',
-            color: 'var(--muted)',
-            textAlign: 'center'
-          }}>
-            Select Your Symbol
-          </div>
-
-          <div style={{ 
-            display: 'flex',
-            gap: '1rem',
-            marginBottom: '2rem',
-            justifyContent: 'center'
-          }}>
-            <button
-              onClick={() => startGame('X')}
-              style={{
-                flex: 1,
-                maxWidth: '120px',
-                padding: '1rem',
-                backgroundColor: 'var(--accent)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '10px',
-                fontWeight: 600,
-                fontSize: '1.1rem',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-              onMouseLeave={(e) => e.target.style.opacity = '1'}
-            >
-              Play as X
+      <div className="page-container">
+        <div className="ttt-select-screen">
+          <h2 className="ttt-select-title">Tic Tac Toe AI</h2>
+          <p className="ttt-select-sub">Choose your symbol to begin. X goes first.</p>
+          <div className="ttt-symbol-btns">
+            <button className="ttt-symbol-btn" onClick={() => startGame('X')}>
+              <span className="ttt-symbol-icon ttt-x">✕</span>
+              <span>Play as X</span>
             </button>
-            <button
-              onClick={() => startGame('O')}
-              style={{
-                flex: 1,
-                maxWidth: '120px',
-                padding: '1rem',
-                backgroundColor: 'var(--accent)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '10px',
-                fontWeight: 600,
-                fontSize: '1.1rem',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-              onMouseLeave={(e) => e.target.style.opacity = '1'}
-            >
-              Play as O
+            <button className="ttt-symbol-btn" onClick={() => startGame('O')}>
+              <span className="ttt-symbol-icon ttt-o">○</span>
+              <span>Play as O</span>
             </button>
           </div>
-
-          <div style={{
-            textAlign: 'center',
-            fontSize: '0.85rem',
-            color: 'var(--muted)',
-            lineHeight: '1.6'
-          }}>
-            <p><strong>X goes first.</strong> Choose wisely!</p>
-          </div>
+          <p className="project-label">Minimax-based Tic Tac Toe — CodSoft Internship Project</p>
         </div>
-
-        <p style={{
-          textAlign: 'center',
-          fontSize: '0.75rem',
-          color: 'var(--muted)',
-          marginTop: '2rem',
-          letterSpacing: '0.02em'
-        }}>
-          Minimax-based Tic Tac Toe — CodSoft Internship Project
-        </p>
-      </Card>
+      </div>
     );
   }
 
+  // Move history list (1-indexed)
+  const moveLog = board
+    .map((cell, i) => cell ? { idx: i, cell } : null)
+    .filter(Boolean);
+
   // Render Game Screen
   return (
-    <Card 
-      title="Tic Tac Toe AI" 
-      subtitle={`You are ${playerSymbol} | Playing on ${difficulty}`}
-      maxWidth="420px"
-    >
-      <style>{`
-        @keyframes fall {
-          to {
-            transform: translateY(100vh) rotate(360deg);
-            opacity: 0;
-          }
-        }
-        @keyframes scaleIn {
-          from {
-            transform: scale(0);
-          }
-          to {
-            transform: scale(1);
-          }
-        }
-        .cell-animate {
-          animation: scaleIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-      `}</style>
-
+    <div className="ttt-game-page">
       {confetti && Array.from({ length: 30 }).map((_, i) => (
         <ConfettiPiece key={i} delay={i * 0.05} duration={1.5 + Math.random() * 0.5} />
       ))}
 
-      {/* Scoreboard */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '0.5rem',
-        marginBottom: '0.75rem',
-        padding: '0.75rem',
-        backgroundColor: 'var(--surface)',
-        borderRadius: '10px'
-      }}>
-        <div style={{
-          textAlign: 'center',
-          padding: '0.5rem',
-          backgroundColor: 'var(--card-bg)',
-          borderRadius: '8px',
-          border: '1px solid var(--border)'
-        }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.25rem' }}>You</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>{scores.player}</div>
+      {/* ── Top scoreboard ── */}
+      <div className="ttt-scoreboard">
+        <div className="ttt-score-block ttt-score-player">
+          <div className="ttt-score-label">PLAYER — 1</div>
+          <div className="ttt-score-num">{String(scores.player).padStart(2, '0')}</div>
         </div>
-        <div style={{
-          textAlign: 'center',
-          padding: '0.5rem',
-          backgroundColor: 'var(--card-bg)',
-          borderRadius: '8px',
-          border: '1px solid var(--border)'
-        }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.25rem' }}>AI</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent)' }}>{scores.ai}</div>
+        <div className="ttt-score-block ttt-score-tie">
+          <div className="ttt-score-label">TIE</div>
+          <div className="ttt-score-num">{scores.draw}</div>
         </div>
-        <div style={{
-          textAlign: 'center',
-          padding: '0.5rem',
-          backgroundColor: 'var(--card-bg)',
-          borderRadius: '8px',
-          border: '1px solid var(--border)'
-        }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.25rem' }}>Draw</div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>{scores.draw}</div>
+        <div className="ttt-score-block ttt-score-ai">
+          <div className="ttt-score-label">PLAYER — 2 (AI)</div>
+          <div className="ttt-score-num">{String(scores.ai).padStart(2, '0')}</div>
         </div>
       </div>
 
-      {/* Turn Indicator */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        marginBottom: '0.75rem',
-        fontSize: '1rem',
-        fontWeight: 600,
-        color: winner ? (winner === 'Draw' ? 'var(--muted)' : 'var(--accent)') : 'var(--text)',
-        minHeight: '2rem',
-        alignItems: 'center'
-      }}>
-        <div>{getTurnStatus()}</div>
-      </div>
+      {/* ── Main area: board + move log ── */}
+      <div className="ttt-arena">
+        {/* Left controls */}
+        <div className="ttt-side-controls">
+          <div className="ttt-side-group">
+            <div className="ttt-status-pill" style={{
+              color: winner ? (winner === 'Draw' ? 'var(--muted)' : 'var(--accent)') : 'var(--text)'
+            }}>
+              {getTurnStatus()}
+            </div>
+          </div>
 
-      {/* Difficulty Buttons */}
-      <div style={{
-        marginBottom: '0.75rem',
-        display: 'flex',
-        gap: '0.5rem',
-        justifyContent: 'center',
-        flexWrap: 'wrap'
-      }}>
-        {['Easy', 'Medium', 'Hard'].map((level) => (
-          <button
-            key={level}
-            onClick={() => changeDifficulty(level)}
-            disabled={isAiThinking}
-            style={{
-              padding: '0.5rem 1rem',
-              backgroundColor: difficulty === level ? 'var(--accent)' : 'var(--surface)',
-              color: difficulty === level ? 'white' : 'var(--text)',
-              border: `1px solid ${difficulty === level ? 'var(--accent)' : 'var(--border)'}`,
-              borderRadius: '8px',
-              fontWeight: 500,
-              fontSize: '0.9rem',
-              cursor: isAiThinking ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              opacity: isAiThinking ? 0.6 : 1
-            }}
-            onMouseEnter={(e) => {
-              if (!isAiThinking && difficulty !== level) {
-                e.target.style.backgroundColor = 'var(--border)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isAiThinking && difficulty !== level) {
-                e.target.style.backgroundColor = 'var(--surface)';
-              }
-            }}
-          >
-            {level}
-          </button>
-        ))}
-      </div>
+          <div className="ttt-side-group">
+            <div className="ttt-side-label">Difficulty</div>
+            <div className="diff-group" style={{ flexDirection: 'column', gap: '0.35rem' }}>
+              {['Easy', 'Medium', 'Hard'].map((level) => (
+                <button
+                  key={level}
+                  onClick={() => changeDifficulty(level)}
+                  disabled={isAiThinking}
+                  className={`diff-btn${difficulty === level ? ' active' : ''}`}
+                  style={{ padding: '0.4rem 0.75rem', textAlign: 'left' }}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Game Board */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(3, 65px)', 
-        gap: '8px',
-        justifyContent: 'center',
-        margin: '0 auto',
-        marginBottom: '0.75rem',
-        padding: '12px',
-        backgroundColor: 'var(--surface)',
-        borderRadius: '14px',
-        border: '1px solid var(--border)',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        width: 'fit-content'
-      }}>
-        {board.map((cell, i) => {
-          const isWinningCell = winningLine && winningLine.includes(i) && cell !== null;
-          const isLastMove = lastMoveIndex === i;
-          return (
+          <div className="ttt-side-group">
             <button
-              key={i}
-              onClick={() => handleCellClick(i)}
-              disabled={!isPlayerTurn || winner || isAiThinking}
-              style={{
-                height: '65px',
-                width: '65px',
-                backgroundColor: isWinningCell ? '#22C55E' : 'var(--surface)',
-                border: isWinningCell ? '3px solid #16A34A' : '1px solid var(--border)',
-                borderRadius: '10px',
-                fontSize: '1.5rem',
-                fontWeight: 700,
-                color: isWinningCell ? '#FFFFFF' : (cell === playerSymbol ? 'var(--text)' : (cell === aiSymbol ? 'var(--accent)' : 'transparent')),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: (!isPlayerTurn || winner || isAiThinking || cell) ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s',
-                boxShadow: isWinningCell ? '0 0 20px rgba(34, 197, 94, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.2)' : (isLastMove ? '0 0 8px rgba(34, 197, 94, 0.3)' : '0 2px 5px rgba(0,0,0,0.02)'),
-                opacity: (!isPlayerTurn || winner || isAiThinking) && !cell ? 0.6 : 1,
-                transform: isWinningCell ? 'scale(1.05)' : 'scale(1)',
-                ...(cell && { animation: 'scaleIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)' })
-              }}
-              onMouseEnter={(e) => {
-                if (isPlayerTurn && !winner && !isAiThinking && !cell) {
-                  e.target.style.backgroundColor = 'var(--border)';
-                  e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.08)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isWinningCell) {
-                  e.target.style.backgroundColor = 'var(--surface)';
-                  e.target.style.boxShadow = cell ? '0 2px 5px rgba(0,0,0,0.02)' : '0 2px 5px rgba(0,0,0,0.02)';
-                }
-              }}
+              onClick={restartGame}
+              disabled={!winner}
+              className={winner ? 'btn btn-primary' : 'btn btn-ghost'}
+              style={{ width: '100%', fontSize: '0.8rem' }}
             >
-              {cell}
+              Play Again
             </button>
-          );
-        })}
+            <button
+              onClick={resetAll}
+              className="btn btn-ghost"
+              style={{ width: '100%', fontSize: '0.8rem', marginTop: '0.35rem' }}
+            >
+              Change Symbol
+            </button>
+          </div>
+        </div>
+
+        {/* Board */}
+        <div className="ttt-board-area">
+          <div className="ttt-board">
+            {board.map((cell, i) => {
+              const isWinningCell = winningLine && winningLine.includes(i) && cell !== null;
+              return (
+                <button
+                  key={i}
+                  className={`ttt-cell${isWinningCell ? ' winning' : ''}${cell ? ' filled' : ''}`}
+                  onClick={() => handleCellClick(i)}
+                  disabled={!isPlayerTurn || winner || isAiThinking}
+                  style={{
+                    animation: cell ? 'scaleIn 0.25s cubic-bezier(0.34,1.56,0.64,1)' : undefined,
+                  }}
+                >
+                  {cell === 'X' && <span className="ttt-x">✕</span>}
+                  {cell === 'O' && <span className="ttt-o">○</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Move log */}
+        <div className="ttt-move-log">
+          <div className="ttt-move-log-header">
+            YOUR MOVES <span className="ttt-move-chevron">∨</span>
+          </div>
+          <div className="ttt-move-list">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className={`ttt-move-item${moveLog[i] ? ' played' : ''}`}>
+                # MOVE {i + 1}
+                {moveLog[i] && (
+                  <span className="ttt-move-sym">
+                    {moveLog[i].cell === playerSymbol ? '(You)' : '(AI)'}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* Action Buttons */}
-      <div style={{ 
-        display: 'flex',
-        gap: '0.75rem',
-        justifyContent: 'center',
-        marginBottom: '0.5rem'
-      }}>
-        <button
-          onClick={restartGame}
-          disabled={!winner}
-          style={{
-            flex: 1,
-            maxWidth: '180px',
-            padding: '0.6rem',
-            backgroundColor: winner ? 'var(--accent)' : 'var(--surface)',
-            color: winner ? 'white' : 'var(--muted)',
-            border: winner ? 'none' : `1px solid var(--border)`,
-            borderRadius: '8px',
-            fontWeight: 600,
-            fontSize: '0.9rem',
-            cursor: winner ? 'pointer' : 'not-allowed',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            if (winner) {
-              e.target.style.opacity = '0.9';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (winner) {
-              e.target.style.opacity = '1';
-            }
-          }}
-        >
-          {winner ? 'Play Again' : 'Play Again'}
-        </button>
-
-        <button
-          onClick={resetAll}
-          style={{
-            flex: 1,
-            maxWidth: '200px',
-            padding: '0.75rem',
-            backgroundColor: 'var(--surface)',
-            color: 'var(--text)',
-            border: '1px solid var(--border)',
-            borderRadius: '10px',
-            fontWeight: 600,
-            fontSize: '0.95rem',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = 'var(--border)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'var(--surface)';
-          }}
-        >
-          Change Symbol
-        </button>
-      </div>
-
-      <p style={{
-        textAlign: 'center',
-        fontSize: '0.7rem',
-        color: 'var(--muted)',
-        marginTop: '0.5rem',
-        letterSpacing: '0.02em'
-      }}>
+      <p className="project-label" style={{ marginTop: '1rem' }}>
         Minimax-based Tic Tac Toe — CodSoft Internship Project
       </p>
-    </Card>
+    </div>
   );
 };
 
