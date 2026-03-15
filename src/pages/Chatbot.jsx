@@ -4,10 +4,10 @@ import { Send, RefreshCcw, Plus, MessageSquare, Bot } from 'lucide-react';
 const SYSTEM_PROMPT = "You are a helpful AI assistant. Be concise and friendly.";
 
 const SUGGESTIONS = [
-  "Explain machine learning in simple terms",
-  "What is the Minimax algorithm?",
-  "How does TF-IDF work?",
-  "Write a Python hello world",
+  "Calculate: what is 15% tip on a $84.50 restaurant bill?",
+  "Play a quick trivia quiz with me — ask me 3 questions",
+  "Tell me a programming joke 😄",
+  "What should I learn after JavaScript to become a full-stack dev?",
 ];
 
 const Chatbot = () => {
